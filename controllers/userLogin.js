@@ -7,28 +7,17 @@ module.exports.userLogin = async (req, res) => {
         let user = await userModel.findOne({ email: email })
         
         if (user && user.password === password) {
-       
             const token = generateToken(user)
             res.cookie("token", token)
-            res.send({
-                message: "you are logged in",
-                token: token
-            })
-
-        if(user.password!=password){
-          res.send({
-            message: "invalid credentials"
-          })
-        }
+            // Redirect to shop page (middleware will handle authentication)
+            res.redirect("/shop")
         } else {
-            res.send({
-                message: "invalid credentials"
-            })
+            // Flash error message and redirect back to login page
+            req.flash("error", "Invalid credentials")
+            res.redirect("/")
         }
     } catch (err) {
-        res.status(500).send({
-            message: "Server error: " + err.message
-        })
+        req.flash("error", "Server error: " + err.message)
+        res.redirect("/")
     }
 }
-
