@@ -1,46 +1,123 @@
 <%- include('./partials/header') %>
-    <div class="w-full h-screen flex items-start px-20 py-20 gap-10">
-        <div class="w-[30%] rounded-md overflow-hidden">
-            <div class="w-full h-80 bg-yellow-500"></div>
-            <div class="w-full flex justify-between px-5 py-4">
-                <h3 class="text-2xl">Clinge Bag</h3>
-                <div class="flex items-center gap-2">
-                    <i class="w-7 h-7 bg-white flex rounded-full items-center justify-center ri-add-line"></i>
-                    <div class="px-2 py-1 rounded-md bg-white text-black">01</div>
-                    <i class="w-7 h-7 bg-white flex rounded-full items-center justify-center ri-subtract-line"></i>
-                </div>
-            </div>
-            <div class="flex items-center justify-between px-5 py-3">
-                <h4 class="text-lg">Net Total</h4>
-                <h2 class="text-lg">₹ 1200</h2>
-            </div>
+
+<div class="min-h-screen bg-gray-50 pt-32 px-6 md:px-20">
+  <div class="flex flex-col lg:flex-row gap-10">
+
+    <!-- Cart Items -->
+    <div class="w-full lg:w-2/3 space-y-6">
+      <% 
+        // Group cart items by product ID and count quantities
+        const cartItems = {};
+        user.cart.forEach(item => {
+          const itemId = item._id.toString();
+          if (cartItems[itemId]) {
+            cartItems[itemId].quantity += 1;
+          } else {
+            cartItems[itemId] = {
+              ...item.toObject(),
+              quantity: 1
+            };
+          }
+        });
+        
+        Object.values(cartItems).forEach((item) => { 
+          const price = item.price;
+          const discountAmount = (price * (item.discount || 0) / 100);
+          const itemTotal = (price - discountAmount) * item.quantity;
+          const platformFee = 20;
+          const total = itemTotal + platformFee;
+      %>
+      <div class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row items-center gap-6">
+        <!-- Image -->
+        <div class="w-full md:w-1/4 h-40 bg-gray-100 flex items-center justify-center overflow-hidden rounded">
+          <% if (item.image) { %>
+            <img src="data:image/jpeg;base64,<%= item.image.toString('base64') %>" alt="<%= item.name %>" class="h-full object-contain">
+          <% } else { %>
+            <p class="text-gray-500">No image</p>
+          <% } %>
         </div>
-        <div class="w-[70%]">
-            <h3 class="text-xl">Price Breakdown</h3>
-            <div class="px-10 mt-5">
-                <div class="flex mt-2">
-                    <h4 class="w-1/3">Total MRP</h4>
-                    <h4>₹ 1920</h4>
-                </div>
-                <div class="flex mt-2">
-                    <h4 class="w-1/3">Discount on MRP</h4>
-                    <h4>₹ 0</h4>
-                </div>
-                <div class="flex mt-2">
-                    <h4 class="w-1/3">Platform Fee</h4>
-                    <h4>₹ 20</h4>
-                </div>
-                <div class="flex mt-2">
-                    <h4 class="w-1/3">Shipping Fee</h4>
-                    <h4>FREE</h4>
-                </div>
+
+        <!-- Details -->
+        <div class="flex-1 w-full">
+          <h2 class="text-xl font-semibold text-gray-800 mb-1"><%= item.name %></h2>
+          <p class="text-sm text-gray-500 mb-2">Platform Fee: ₹20.00</p>
+          
+          <!-- Quantity Controls -->
+          <div class="flex items-center gap-4 mb-3">
+            <span class="text-sm text-gray-600">Quantity:</span>
+            <div class="flex items-center border rounded-lg">
+              <form action="/cart/decrease" method="POST" class="inline">
+                <input type="hidden" name="itemId" value="<%= item._id %>">
+                <button type="submit" class="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-100 rounded-l-lg">-</button>
+              </form>
+              <span class="px-4 py-1 bg-gray-50 text-gray-800 font-medium"><%= item.quantity %></span>
+              <form action="/cart/increase" method="POST" class="inline">
+                <input type="hidden" name="itemId" value="<%= item._id %>">
+                <button type="submit" class="px-3 py-1 text-lg font-bold text-gray-600 hover:bg-gray-100 rounded-r-lg">+</button>
+              </form>
             </div>
-            <div class="w-full h-[1px] bg-black mt-10"></div>
-            <div class="flex mt-5">
-                <h3 class="w-1/3 text-xl">Total Amount</h3>
-                <h3 class="font-semibold text-xl text-green-600">₹ 1940</h3>
+          </div>
+          
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-600 line-through">₹ <%= (price * item.quantity).toFixed(2) %></p>
+              <p class="text-lg font-bold text-green-600">₹ <%= total.toFixed(2) %></p>
             </div>
-            <form action=""></form>
+            <!-- Remove Button -->
+            <form action="/cart/remove" method="POST">
+              <input type="hidden" name="itemId" value="<%= item._id %>">
+              <button type="submit" class="text-red-500 hover:text-red-700 text-sm">Remove All</button>
+            </form>
+          </div>
         </div>
+      </div>
+      <% }); %>
     </div>
-    <%- include('./partials/footer') %>
+
+    <!-- Price Breakdown -->
+   <div class="w-full lg:w-1/3">
+  <div class="bg-white p-6 rounded-xl shadow space-y-6 sticky top-28">
+    <h2 class="text-xl font-bold">Price Details</h2>
+
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span>Total MRP</span>
+          <span>₹ <%= user.cart.reduce((sum, item) => sum + item.price, 0).toFixed(2) %></span>
+        </div>
+        <div class="flex justify-between">
+          <span>Discount</span>
+          <span class="text-green-600">-₹ <%= user.cart.reduce((sum, item) => sum + (item.price * (item.discount || 0) / 100), 0).toFixed(2) %></span>
+        </div>
+        <div class="flex justify-between">
+          <span>Platform Fee</span>
+          <span>₹ <%= (user.cart.length > 0 ? 20 : 0).toFixed(2) %></span>
+        </div>
+        <div class="flex justify-between">
+          <span>Shipping</span>
+          <span class="text-green-700 font-medium">FREE</span>
+        </div>
+      </div>
+
+      <hr class="my-2">
+
+      <div class="flex justify-between font-semibold text-lg">
+        <span>Total</span>
+        <span class="text-green-600">
+          ₹ <%= (
+            user.cart.reduce((sum, item) => sum + item.price, 0) -
+            user.cart.reduce((sum, item) => sum + (item.price * (item.discount || 0) / 100), 0) +
+            (user.cart.length > 0 ? 20 : 0)
+          ).toFixed(2) %>
+        </span>
+      </div>
+
+      <form action="/checkout" method="POST">
+        <button type="submit" class="w-full py-3 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+          Proceed to Checkout
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>

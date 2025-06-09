@@ -10,10 +10,13 @@ const userSchema= new Schema({
     Phone_number: String,
     password: {type: String, required: true },
     profile_pic:String,
-    cart: {type:Array, default:[]},
+    cart: [{
+       type: mongoose.Schema.Types.ObjectId,
+       ref:'product'
+    },
+],
     
 
-    
 })
 
 module.exports= mongoose.model("user",userSchema)

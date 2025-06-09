@@ -1,70 +1,60 @@
 const express = require("express");
 const { isLoggedin } = require("../Middlewares/isLoggedin");
+const productModel = require("../Model/product-model");
+const userModel = require("../Model/user-model");
 const homeRouter = express.Router()
-//const {"index"} = require("../views/partials/index.ejs")
-
 
 homeRouter.get("/",function(req,res){
     let error = req.flash("error")
    res.render("index",{error})
-    
 })
 
-homeRouter.get("/shop",isLoggedin,function(req,res){
+homeRouter.get("/shop",isLoggedin,async function(req,res){
+    let products = await productModel.find()
+    res.render("shop",{products})
+})
 
-  const sampleProducts = [
-        {
-            name: "Sample Product 1",
-            price: 999,
-            bgcolor: "#f3f4f6",
-            panelcolor: "#ffffff",
-            textcolor: "#000000",
-            image: Buffer.from("")
-        },
-        {
-            name: "Sample Product 2", 
-            price: 1299,
-            bgcolor: "#fef3c7",
-            panelcolor: "#fbbf24",
-            textcolor: "#ffffff",
-            image: Buffer.from("")
-        },
-        {
-            name: "Sample Product 3",
-            price: 799,
-            bgcolor: "#dbeafe",
-            panelcolor: "#3b82f6",
-            textcolor: "#ffffff", 
-            image: Buffer.from("")
-        },
-        {
-            name: "Sample Product 4",
-            price: 1599,
-            bgcolor: "#dcfce7",
-            panelcolor: "#22c55e",
-            textcolor: "#ffffff",
-            image: Buffer.from("")
-        },
-        {
-            name: "Sample Product 5",
-            price: 899,
-            bgcolor: "#fce7f3",
-            panelcolor: "#ec4899",
-            textcolor: "#ffffff",
-            image: Buffer.from("")
-        },
-        {
-            name: "Sample Product 6",
-            price: 1199,
-            bgcolor: "#f3e8ff",
-            panelcolor: "#8b5cf6",
-            textcolor: "#ffffff",
-            image: Buffer.from("")
-        }
-    ];
+homeRouter.get("/addtocart/:productid",isLoggedin,async function(req,res){
+    let user = await userModel.findOne({email:req.user.email})
+    user.cart.push(req.params.productid)
+    await user.save()
+    res.redirect("/shop")
+})
 
+homeRouter.get("/cart",isLoggedin,async function(req,res){
+    let user=await userModel.findOne({email:req.user.email}).populate("cart")
+    res.render("cart",{user})
+})
 
-    res.render("shop",{products: sampleProducts})
+homeRouter.post("/cart/remove",isLoggedin,async function(req,res){
+    let user = await userModel.findOne({email:req.user.email})
+    const cart_id = req.body.itemId
+    // Remove all instances of this product
+    user.cart = user.cart.filter(id => id.toString() !== cart_id)
+    await user.save()
+    res.redirect("/cart")
+})
+
+homeRouter.post("/cart/increase",isLoggedin,async function(req,res){
+    let user = await userModel.findOne({email:req.user.email})
+    const productId = req.body.itemId
+    user.cart.push(productId)
+    await user.save()
+    res.redirect("/cart")
+})
+
+homeRouter.post("/cart/decrease",isLoggedin,async function(req,res){
+    let user = await userModel.findOne({email:req.user.email})
+    const cart_id = req.body.itemId
+    
+    // Find the index of the first occurrence and remove only that one
+    const index = user.cart.findIndex(id => id.toString() === cart_id)
+    if (index > -1) {
+        user.cart.splice(index, 1)
+    }
+    
+    await user.save()
+    res.redirect("/cart")
 })
 
 module.exports=homeRouter

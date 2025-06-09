@@ -1,55 +1,125 @@
 <%- include('./partials/header') %>
 
-    <% if(success.length>0){ %>
-        <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
-            <span class="inline-block mt-1 mb-1 text-white">
-                <%= success %>
-            </span>
-        </div>
-        <% } %>
+<% if(success.length>0){ %>
+    <div class="absolute top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 rounded-md bg-blue-500">
+        <span class="inline-block mt-1 mb-1 text-white">
+            <%= success %>
+        </span>
+    </div>
+<% } %>
 
-            <div class="min-h-screen flex flex-col">
-                <div class="container px-10 py-20 flex flex-grow">
-                    <div class="w-[25%] flex h-screen flex-col items-start">
-                        <div class="flex flex-col">
-                            <a class="block w-fit mb-2" href="">All Products</a>
-                            <a class="block w-fit mb-2" href="">Create new product</a>
+<div class="min-h-screen flex flex-col">
+    <div class="container px-10 py-20 flex flex-grow">
+        <div class="w-[25%] flex h-screen flex-col items-start">
+            <div class="flex flex-col">
+                <a class="block w-fit mb-2" href="">All Products</a>
+                <a class="block w-fit mb-2" href="">Create new product</a>
+            </div>
+        </div>
+        <main class="w-3/4 bg-white p-8 shadow ml-4">
+            <h2 class="text-xl font-bold mb-4">Create New Product</h2>
+            <form autocomplete="off" action="/products/create" method="post" enctype="multipart/form-data">
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-2">Product Details</h3>
+                    <div class="mb-4">
+                        <label class="block mb-2 font-medium">Product Image</label>
+                        <input name="image" type="file" class="py-2 px-4 rounded" accept="image/*" required>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <input name="name" type="text" placeholder="Product Name"
+                            class="border p-2 rounded w-full" required>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block mb-1 text-sm font-medium text-gray-700">Original Price (₹)</label>
+                                <input name="price" type="number" placeholder="1000" step="0.01" min="0"
+                                    class="border p-2 rounded w-full" required>
+                            </div>
+                            <div>
+                                <label class="block mb-1 text-sm font-medium text-gray-700">Discount Percentage (%)</label>
+                                <input name="discount" type="number" placeholder="20" step="0.01" min="0" max="100"
+                                    class="border p-2 rounded w-full">
+                                <small class="text-gray-500">Enter 0 for no discount, 20 for 20% off</small>
+                            </div>
                         </div>
                     </div>
-                    <main class="w-3/4 bg-white p-8 shadow ml-4">
-                        <h2 class="text-xl font-bold mb-4">Create New Product</h2>
-                        <form autocomplete="off" action="/products/create" method="post" enctype="multipart/form-data">
-                            <div class="mb-6">
-                                <h3 class="text-lg font-semibold mb-2">Product Details</h3>
-                                <div class="mb-4">
-                                    <label class="block mb-2 font-medium">Product Image</label>
-                                    <input name="image" type="file" class="py-2 px-4 rounded" value="Select File">
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <input name="name" type="text" placeholder="Product Name"
-                                        class="border p-2 rounded w-full">
-                                    <input name="price" type="text" placeholder="Product Price"
-                                        class="border p-2 rounded w-full">
-                                    <input name="discount" type="text" placeholder="Discount Price"
-                                        class="border p-2 rounded w-full">
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 class="text-lg font-semibold mb-2">Panel Details</h3>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <input name="bgcolor" type="text" placeholder="Background Color"
-                                        class="border p-2 rounded w-full">
-                                    <input name="panelcolor" type="text" placeholder="Panel Color"
-                                        class="border p-2 rounded w-full">
-                                    <input name="textcolor" type="text" placeholder="Text Color"
-                                        class="border p-2 rounded w-full">
-                                </div>
-                            </div>
-                            <input class="px-5 py-2 rounded mt-3 bg-blue-500 text-white" type="submit"
-                                value="Create New Product">
-                        </form>
-                    </main>
                 </div>
-            </div>
-            <%- include('./partials/footer') %>
+
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Panel Details</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-700">Background Color</label>
+                            <input name="bgcolor" type="color" value="#f9fafb"
+                                class="border p-1 rounded w-full h-10">
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-700">Panel Color</label>
+                            <input name="panelcolor" type="color" value="#ffffff"
+                                class="border p-1 rounded w-full h-10">
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-700">Text Color</label>
+                            <input name="textcolor" type="color" value="#000000"
+                                class="border p-1 rounded w-full h-10">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preview Section -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-medium mb-2">Price Preview:</h4>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg font-semibold text-gray-900" id="finalPrice">₹0</span>
+                        <span class="text-sm text-gray-500 line-through" id="originalPrice" style="display: none;">₹0</span>
+                        <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded" id="discountBadge" style="display: none;">0% OFF</span>
+                    </div>
+                </div>
+
+                <input class="px-5 py-2 rounded mt-3 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer" type="submit"
+                    value="Create New Product">
+            </form>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Real-time price preview
+    const priceInput = document.querySelector('input[name="price"]');
+    const discountInput = document.querySelector('input[name="discount"]');
+    const finalPriceEl = document.getElementById('finalPrice');
+    const originalPriceEl = document.getElementById('originalPrice');
+    const discountBadgeEl = document.getElementById('discountBadge');
+
+    function updatePreview() {
+        const price = parseFloat(priceInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        
+        if (price > 0) {
+            if (discount > 0) {
+                const discountedPrice = price - (price * (discount / 100));
+                finalPriceEl.textContent = `₹${Math.round(discountedPrice)}`;
+                originalPriceEl.textContent = `₹${Math.round(price)}`;
+                originalPriceEl.style.display = 'inline';
+                discountBadgeEl.textContent = `${Math.round(discount)}% OFF`;
+                discountBadgeEl.style.display = 'inline';
+            } else {
+                finalPriceEl.textContent = `₹${Math.round(price)}`;
+                originalPriceEl.style.display = 'none';
+                discountBadgeEl.style.display = 'none';
+            }
+        } else {
+            finalPriceEl.textContent = '₹0';
+            originalPriceEl.style.display = 'none';
+            discountBadgeEl.style.display = 'none';
+        }
+    }
+
+    priceInput.addEventListener('input', updatePreview);
+    discountInput.addEventListener('input', updatePreview);
+    
+    // Initialize preview
+    updatePreview();
+</script>
+
+<%- include('./partials/footer') %>

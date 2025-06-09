@@ -11,4 +11,4 @@ const prodSchema = new Schema({
     textcolor: { type: String, default: "#000000" } // Text color
 })
 
-module.exports = mongoose.model("prod", prodSchema)
+module.exports = mongoose.model("product", prodSchema)

@@ -11,5 +11,6 @@ userRouter.get("/",function(req,res){
 
 userRouter.post("/register", registerUser)
 userRouter.post("/login", userLogin)
+//userRouter.post("/logout",userLogout)
 
 module.exports= userRouter

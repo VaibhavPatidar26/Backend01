@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>Simple Navbar</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="font-['helvetica_now_display']">
-    <nav class="w-full fixed top-0 left-0 px-5 py-3">
-        <h3 class="text-xl">Scatch</h3>
+<body class="bg-gray-50">
+    <!-- Simple Navigation -->
+    <nav class="w-full fixed top-0 left-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Brand Logo -->
+                <div class="text-gray-900 text-xl font-semibold">
+                    MyStore
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex items-center space-x-8">
+                    <a href="/shop" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        Home
+                    </a>
+                    <a href="/cart" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        Cart
+                    </a>
+                    <a href="/" class="text-red-500 hover:text-red-900 transition-colors">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
+</body>
+</html>
